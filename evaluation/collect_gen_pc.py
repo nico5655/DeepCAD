@@ -33,6 +33,7 @@ def process_one(path):
     try:
         shape = vec2CADsolid(out_vec)
     except Exception as e:
+        print(e)
         print("create_CAD failed", data_id)
         return None
 

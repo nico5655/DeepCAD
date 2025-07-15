@@ -11,3 +11,4 @@ torch
 tqdm
 trimesh
 scikit-learn
+pyrender

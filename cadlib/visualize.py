@@ -116,6 +116,42 @@ def point_local2global(point, sketch_plane: CoordSystem, to_gp_Pnt=True):
         return gp_Pnt(*g_point)
     return g_point
 
+import pyrender
+
+def render_mesh(mesh, resolution=(224, 224), camera_distance=2.5):
+    # Load mesh with Trimesh
+    if not isinstance(mesh, trimesh.Trimesh):
+        mesh = mesh.dump(concatenate=True)
+
+    # Convert to pyrender mesh
+    pyrender_mesh = pyrender.Mesh.from_trimesh(mesh, smooth=False)
+
+    # Set up scene
+    scene = pyrender.Scene()
+    scene.add(pyrender_mesh)
+
+    # Camera setup
+    cam = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
+    cam_pose = np.array([
+        [1.0, 0.0,  0.0,  0.0],
+        [0.0, 1.0,  0.0,  0.0],
+        [0.0, 0.0,  1.0,  camera_distance],
+        [0.0, 0.0,  0.0,  1.0]
+    ])
+    scene.add(cam, pose=cam_pose)
+
+    # Light
+    light = pyrender.DirectionalLight(color=np.ones(3), intensity=3.0)
+    scene.add(light, pose=cam_pose)
+
+    # Renderer
+    r = pyrender.OffscreenRenderer(viewport_width=resolution[0],
+                                   viewport_height=resolution[1])
+    color, _ = r.render(scene)
+
+    img= Image.fromarray(color)
+    name = random.randint(100000, 999999)
+    img.save(f'{name}.png')
 
 def CADsolid2pc(shape, n_points, name=None):
     """convert opencascade solid to point clouds"""
@@ -128,6 +164,7 @@ def CADsolid2pc(shape, n_points, name=None):
         name = random.randint(100000, 999999)
     write_stl_file(shape, "tmp_out_{}.stl".format(name))
     out_mesh = trimesh.load("tmp_out_{}.stl".format(name))
+    render_mesh(out_mesh)
     os.system("rm tmp_out_{}.stl".format(name))
     out_pc, _ = sample_surface(out_mesh, n_points)
     return out_pc

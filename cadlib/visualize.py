@@ -14,6 +14,7 @@ import os
 import trimesh
 from trimesh.sample import sample_surface
 import random
+import numpy as np
 
 
 def vec2CADsolid(vec, is_numerical=True, n=256):
@@ -132,10 +133,13 @@ def render_mesh(mesh, resolution=(224, 224), camera_distance=2.5):
 
     # Camera setup
     cam = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
+    camera_position=2*np.random.rand(3)-1
+    camera_position=camera_position/(((camera_position**2).sum(axis=-1))**(1/2))
+    camera_position=camera_distance*camera_position
     cam_pose = np.array([
-        [1.0, 0.0,  0.0,  0.0],
-        [0.0, 1.0,  0.0,  0.0],
-        [0.0, 0.0,  1.0,  camera_distance],
+        [1.0, 0.0,  0.0,  camera_position[0]],
+        [0.0, 1.0,  0.0,  camera_position[1]],
+        [0.0, 0.0,  1.0,  camera_position[2]],
         [0.0, 0.0,  0.0,  1.0]
     ])
     scene.add(cam, pose=cam_pose)

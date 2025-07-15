@@ -5,7 +5,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut, BRepAlgoAPI_Fuse, BRepAlgoAPI_
 from OCC.Core.GC import GC_MakeArcOfCircle
 from OCC.Extend.DataExchange import write_stl_file
 from OCC.Core.Bnd import Bnd_Box
-from OCC.Core.BRepBndLib import brepbndlib_Add
+from OCC.Core.BRepBndLib import brepbndlib_Add, brepbndlib
 from copy import copy
 from .extrude import *
 from .sketch import Loop, Profile
@@ -120,7 +120,7 @@ def point_local2global(point, sketch_plane: CoordSystem, to_gp_Pnt=True):
 def CADsolid2pc(shape, n_points, name=None):
     """convert opencascade solid to point clouds"""
     bbox = Bnd_Box()
-    brepbndlib_Add(shape, bbox)
+    brepbndlib.Add(shape, bbox)
     if bbox.IsVoid():
         raise ValueError("box check failed")
 

@@ -30,10 +30,9 @@ def process_one(path):
     with h5py.File(path, 'r') as fp:
         out_vec = fp["out_vec"][:].astype(np.float64)
 
-    shape = vec2CADsolid(out_vec)
-    print('success')
     try:
-        pass
+        shape = vec2CADsolid(out_vec)
+        print('success')
     except Exception as e:
         print(e)
         print("create_CAD failed", data_id)

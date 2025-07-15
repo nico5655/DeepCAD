@@ -31,6 +31,7 @@ def process_one(path):
         out_vec = fp["out_vec"][:].astype(np.float64)
 
     shape = vec2CADsolid(out_vec)
+    print('success')
     try:
         pass
     except Exception as e:

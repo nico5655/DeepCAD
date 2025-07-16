@@ -10,8 +10,9 @@ import argparse
 import sys
 sys.path.append("..")
 from cadlib.extrude import CADSequence
-from cadlib.visualize import CADsolid2pc, create_CAD
+from cadlib.visualize import CADsolid2pc, create_CAD, CADSolid2views
 from utils.pc_utils import write_ply, read_ply
+from PIL import Image
 
 DATA_ROOT = "../data"
 RAW_DATA = os.path.join(DATA_ROOT, "cad_json")
@@ -55,13 +56,23 @@ def process_one(data_id):
         print("convert point cloud failed:", data_id)
         return None
 
+    try:
+        out_images=CADSolid2views(shape, 8, data_id.split("/")[-1])
+    except Exception as e:
+        print("convert to image failed:", data_id)
+        return None
+        
     save_path = os.path.join(SAVE_DIR, data_id + ".ply")
     truck_dir = os.path.dirname(save_path)
     if not os.path.exists(truck_dir):
         os.makedirs(truck_dir)
 
     write_ply(out_pc, save_path)
-
+    for k,img in enumerate(out_images):
+        azimuth=k*45
+        save_img_path = os.path.join(SAVE_DIR, f'{data_id}_{azimuth:03d}.png')
+        image=Image.from_array(img)
+        image.save(save_img_path)
 
 with open(RECORD_FILE, "r") as fp:
     all_data = json.load(fp)

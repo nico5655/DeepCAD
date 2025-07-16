@@ -15,7 +15,7 @@ import trimesh
 from trimesh.sample import sample_surface
 import random
 import numpy as np
-
+from PIL import Image
 
 def vec2CADsolid(vec, is_numerical=True, n=256):
     cad = CADSequence.from_vector(vec, is_numerical=is_numerical, n=256)
@@ -120,42 +120,7 @@ def point_local2global(point, sketch_plane: CoordSystem, to_gp_Pnt=True):
 import pyrender
 
 def render_mesh(mesh, resolution=(224, 224), camera_distance=2.5):
-    # Load mesh with Trimesh
-    if not isinstance(mesh, trimesh.Trimesh):
-        mesh = mesh.dump(concatenate=True)
-
-    # Convert to pyrender mesh
-    pyrender_mesh = pyrender.Mesh.from_trimesh(mesh, smooth=False)
-
-    # Set up scene
-    scene = pyrender.Scene()
-    scene.add(pyrender_mesh)
-
-    # Camera setup
-    cam = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
-    camera_position=2*np.random.rand(3)-1
-    camera_position=camera_position/(((camera_position**2).sum(axis=-1))**(1/2))
-    camera_position=camera_distance*camera_position
-    cam_pose = np.array([
-        [1.0, 0.0,  0.0,  camera_position[0]],
-        [0.0, 1.0,  0.0,  camera_position[1]],
-        [0.0, 0.0,  1.0,  camera_position[2]],
-        [0.0, 0.0,  0.0,  1.0]
-    ])
-    scene.add(cam, pose=cam_pose)
-
-    # Light
-    light = pyrender.DirectionalLight(color=np.ones(3), intensity=3.0)
-    scene.add(light, pose=cam_pose)
-
-    # Renderer
-    r = pyrender.OffscreenRenderer(viewport_width=resolution[0],
-                                   viewport_height=resolution[1])
-    color, _ = r.render(scene)
-
-    img= Image.fromarray(color)
-    name = random.randint(100000, 999999)
-    img.save(f'{name}.png')
+    pass
 
 def CADsolid2pc(shape, n_points, name=None):
     """convert opencascade solid to point clouds"""
@@ -168,7 +133,25 @@ def CADsolid2pc(shape, n_points, name=None):
         name = random.randint(100000, 999999)
     write_stl_file(shape, "tmp_out_{}.stl".format(name))
     out_mesh = trimesh.load("tmp_out_{}.stl".format(name))
-    render_mesh(out_mesh)
     os.system("rm tmp_out_{}.stl".format(name))
     out_pc, _ = sample_surface(out_mesh, n_points)
     return out_pc
+
+def CADSolid2views(shape,n_views,name=None):
+    bbox = Bnd_Box()
+    brepbndlib.Add(shape, bbox)
+    if bbox.IsVoid():
+        raise ValueError("box check failed")
+    if name is None:
+        name = random.randint(100000, 999999)
+    write_stl_file(shape, "tmp_out_{}.stl".format(name))
+    out_mesh = trimesh.load("tmp_out_{}.stl".format(name))
+    os.system(f"./blender-3.6.0-linux-x64/blender --background --python render.py -- {out_mesh} {name}")
+    os.system("rm tmp_out_{}.stl".format(name))
+    imgs=[]
+    for i in range(n_views):
+        azimuth=i*45
+        img=Image.open(f"{name}_{azimuth:03d}.png")
+        imgs.append(np.array(img)[:,::-1,:])
+        os.system(f'rm {name}_{azimuth:03d}.png')
+    return imgs

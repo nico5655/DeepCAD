@@ -73,6 +73,7 @@ def process_one(data_id):
         save_img_path = os.path.join(SAVE_DIR, f'{data_id}_{azimuth:03d}.png')
         image=Image.from_array(img)
         image.save(save_img_path)
+        print(save_dir)
 
 with open(RECORD_FILE, "r") as fp:
     all_data = json.load(fp)
@@ -87,4 +88,4 @@ args = parser.parse_args()
 if not args.only_test:
     Parallel(n_jobs=10, verbose=2)(delayed(process_one)(x) for x in all_data["train"])
     Parallel(n_jobs=10, verbose=2)(delayed(process_one)(x) for x in all_data["validation"])
-Parallel(n_jobs=10, verbose=2)(delayed(process_one)(x) for x in all_data["test"])
+Parallel(n_jobs=1, verbose=2)(delayed(process_one)(x) for x in all_data["test"])

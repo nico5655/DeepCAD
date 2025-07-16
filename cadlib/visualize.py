@@ -142,6 +142,7 @@ def CADSolid2views(shape,n_views,name=None):
     brepbndlib.Add(shape, bbox)
     if bbox.IsVoid():
         raise ValueError("box check failed")
+    name=None
     if name is None:
         name = random.randint(100000, 999999)
     write_stl_file(shape, "tmp_out_{}.stl".format(name))

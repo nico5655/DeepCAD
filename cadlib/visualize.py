@@ -146,7 +146,7 @@ def CADSolid2views(shape,n_views,name=None):
         name = random.randint(100000, 999999)
     write_stl_file(shape, "tmp_out_{}.stl".format(name))
     out_mesh = trimesh.load("tmp_out_{}.stl".format(name))
-    os.system(f"cd ../ && ./blender-3.6.0-linux-x64/blender --background --python render.py -- {out_mesh} {name}")
+    print(os.system(f"cd ../ && ./blender-3.6.0-linux-x64/blender --background --python render.py -- {out_mesh} {name}"))
     os.system("rm tmp_out_{}.stl".format(name))
     imgs=[]
     for i in range(n_views):

@@ -149,11 +149,11 @@ def CADSolid2views(shape,n_views,name=None):
     command=f"cd /content && ./blender-3.6.0-linux-x64/blender --background --log-level 2 --python render.py -- /content/tmp_out_{name}.stl {name}"
     print(command)
     print(os.system(command))
-    os.system("rm tmp_out_{}.stl".format(name))
+    os.system("rm /content/tmp_out_{}.stl".format(name))
     imgs=[]
     for i in range(n_views):
         azimuth=i*45
-        img=Image.open(f"{name}_{azimuth:03d}.png")
+        img=Image.open(f"/content/{name}_{azimuth:03d}.png")
         imgs.append(np.array(img)[:,::-1,:])
-        os.system(f'rm {name}_{azimuth:03d}.png')
+        os.system(f'rm /content/{name}_{azimuth:03d}.png')
     return imgs

@@ -146,7 +146,7 @@ def CADSolid2views(shape,n_views,name=None):
     if name is None:
         name = random.randint(100000, 999999)
     write_stl_file(shape, "tmp_out_{}.stl".format(name))
-    command=f"cd /content && ./blender-3.6.0-linux-x64/blender --background --python render.py -- tmp_out_{name}.stl {name}"
+    command=f"cd /content && ./blender-3.6.0-linux-x64/blender --background --python render.py -- DeepCAD/tmp_out_{name}.stl {name}"
     print(command)
     print(os.system(command))
     os.system("rm tmp_out_{}.stl".format(name))

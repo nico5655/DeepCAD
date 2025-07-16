@@ -73,7 +73,7 @@ def process_one(data_id):
         save_img_path = os.path.join(SAVE_DIR, f'{data_id}_{azimuth:03d}.png')
         image=Image.fromarray(img)
         image.save(save_img_path)
-        print(save_dir)
+        print(save_img_path)
 
 with open(RECORD_FILE, "r") as fp:
     all_data = json.load(fp)

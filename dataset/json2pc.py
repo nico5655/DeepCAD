@@ -74,6 +74,7 @@ def process_one(data_id):
         image=Image.from_array(img)
         image.save(save_img_path)
         print(save_dir)
+        print(1/0)
 
 with open(RECORD_FILE, "r") as fp:
     all_data = json.load(fp)

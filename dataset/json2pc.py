@@ -71,7 +71,7 @@ def process_one(data_id):
     for k,img in enumerate(out_images):
         azimuth=k*45
         save_img_path = os.path.join(SAVE_DIR, f'{data_id}_{azimuth:03d}.png')
-        image=Image.from_array(img)
+        image=Image.fromarray(img)
         image.save(save_img_path)
         print(save_dir)
 

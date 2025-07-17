@@ -146,7 +146,7 @@ def CADSolid2views(shape,n_views,name=None):
     if name is None:
         name = random.randint(100000, 999999)
     write_stl_file(shape, "/content/tmp_out_{}.stl".format(name))
-    out_mesh = trimesh.load("tmp_out_{}.stl".format(name))
+    out_mesh = trimesh.load("/content/tmp_out_{}.stl".format(name))
     print(np.array(out_mesh.vertices).max(axis=0))
     command=f"cd /content && ./blender-3.6.0-linux-x64/blender --background --python render.py -- /content/tmp_out_{name}.stl {name} 1>nul"
     print(command)

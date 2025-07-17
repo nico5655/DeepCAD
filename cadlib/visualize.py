@@ -149,7 +149,7 @@ def CADSolid2views(shape,n_views,name=None):
     command=f"cd /content && ./blender-3.6.0-linux-x64/blender --background --python render.py -- /content/tmp_out_{name}.stl {name} 1>nul"
     print(command)
     print(os.system(command))
-    os.system("rm /content/tmp_out_{}.stl".format(name))
+    #os.system("rm /content/tmp_out_{}.stl".format(name))
     imgs=[]
     for i in range(n_views):
         azimuth=i*45

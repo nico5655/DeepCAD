@@ -55,9 +55,9 @@ def process_one(data_id):
     except Exception as e:
         print("convert point cloud failed:", data_id)
         return None
-
+    out_images=CADSolid2views(shape, 8, data_id.split("/")[-1])
     try:
-        out_images=CADSolid2views(shape, 8, data_id.split("/")[-1])
+        pass
     except Exception as e:
         print("convert to image failed:", data_id)
         return None

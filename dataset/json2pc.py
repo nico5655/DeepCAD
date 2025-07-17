@@ -55,9 +55,8 @@ def process_one(data_id):
     except Exception as e:
         print("convert point cloud failed:", data_id)
         return None
-    out_images=CADSolid2views(shape, 8, data_id.split("/")[-1])
     try:
-        pass
+        out_images=CADSolid2views(shape, 8, data_id.split("/")[-1])
     except Exception as e:
         print("convert to image failed:", data_id)
         return None
@@ -88,4 +87,4 @@ args = parser.parse_args()
 if not args.only_test:
     Parallel(n_jobs=10, verbose=2)(delayed(process_one)(x) for x in all_data["train"])
     Parallel(n_jobs=10, verbose=2)(delayed(process_one)(x) for x in all_data["validation"])
-Parallel(n_jobs=1, verbose=2)(delayed(process_one)(x) for x in all_data["test"][:1])
+Parallel(n_jobs=1, verbose=2)(delayed(process_one)(x) for x in all_data["test"][:10])

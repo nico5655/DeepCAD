@@ -119,9 +119,6 @@ def point_local2global(point, sketch_plane: CoordSystem, to_gp_Pnt=True):
 
 import pyrender
 
-def render_mesh(mesh, resolution=(224, 224), camera_distance=2.5):
-    pass
-
 def CADsolid2pc(shape, n_points, name=None):
     """convert opencascade solid to point clouds"""
     bbox = Bnd_Box()
@@ -137,24 +134,41 @@ def CADsolid2pc(shape, n_points, name=None):
     out_pc, _ = sample_surface(out_mesh, n_points)
     return out_pc
 
-def CADSolid2views(shape,n_views,name=None):
-    bbox = Bnd_Box()
-    brepbndlib.Add(shape, bbox)
-    if bbox.IsVoid():
-        raise ValueError("box check failed")
-    name=None
-    if name is None:
-        name = random.randint(100000, 999999)
-    write_stl_file(shape, "/content/tmp_out_{}.stl".format(name))
-    out_mesh = trimesh.load("/content/tmp_out_{}.stl".format(name))
-    command=f"cd /content && ./blender-3.6.0-linux-x64/blender --background --python render.py -- /content/tmp_out_{name}.stl {name} 1>nul"
+def BatchCADSolid2views(shapes,names=None):
+    if names is None:
+        names=[]
+    for k,shape in enumerate(shapes):
+        bbox = Bnd_Box()
+        brepbndlib.Add(shape, bbox)
+        if bbox.IsVoid():
+            raise ValueError("box check failed")
+        if len(names) <= k:
+            name = random.randint(100000, 999999)
+            names.append(name)
+        name=names[k]
+        write_stl_file(shape, "../tmp_out_{}.stl".format(name))
+
+    files_str=' '.join([f'tmp_out_{name}.stl C:/Users/NWI3/Desktop/gen-models/DeepCAD/{name}' for name in names])
+    command=f"cd ../ && blender --background --python render.py -- {files_str} 1>nul"
     print(command)
     print(os.system(command))
-    os.system("rm /content/tmp_out_{}.stl".format(name))
-    imgs=[]
-    for i in range(n_views):
-        azimuth=i*45
-        img=Image.open(f"/content/{name}_{azimuth:03d}.png")
-        imgs.append(np.array(img)[:,::-1,:])
-        os.system(f'rm /content/{name}_{azimuth:03d}.png')
-    return imgs
+
+    all_imgs=[]
+    metadatas=[]
+    for name in names:
+        os.system("rm ../tmp_out_{}.stl".format(name))
+        imgs=[]
+        for i in range(6):
+            azimuth=i*60
+            img=Image.open(f"../{name}_{azimuth:03d}.png")
+            imgs.append(np.array(img)[:,::-1,:])
+            os.system(f'rm ../{name}_{azimuth:03d}.png')
+
+        all_imgs.append(imgs)
+        metadata=''
+        with open(f'../{name}_metadata.txt','r') as f:
+            metadata=f.read()
+        os.system(f'rm ../{name}_metadata.txt')
+        metadatas.append(metadata)
+
+    return all_imgs,metadatas

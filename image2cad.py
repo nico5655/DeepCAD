@@ -14,7 +14,8 @@ from plyfile import PlyData, PlyElement
 import sys
 sys.path.append("..")
 from agent import BaseAgent
-from pointnet2_ops.pointnet2_modules import PointnetFPModule, PointnetSAModule
+from skimage import io, transform
+from torchvision.transforms import Normalize
 from plyfile import PlyData, PlyElement
 
 
@@ -63,15 +64,19 @@ class Config(object):
 
 import torchvision.models as models
 import torchvision.transforms as transforms
+from timm import create_model
 
-class ImageToLatentResNet(nn.Module):
-    def __init__(self, output_dim=256):
-        super(ImageToLatentResNet, self).__init__()
-        self.backbone = models.resnet50(pretrained=True)
-        self.backbone.fc = nn.Linear(2048, output_dim)  # Replace final layer
+class ViTToDeepCADLatent(nn.Module):
+    def __init__(self, latent_dim=256, pretrained=True):
+        super().__init__()
+        self.vit = create_model("vit_base_patch16_224", pretrained=pretrained)
+        self.vit.reset_classifier(0)
+        self.project = nn.Linear(self.vit.num_features, latent_dim)
 
     def forward(self, x):
-        return self.backbone(x)
+        features = self.vit(x)           # [B, 768]
+        latent = self.project(features)  # [B, 256]
+        return latent
 
 
 class TrainAgent(BaseAgent):
@@ -118,43 +123,44 @@ def read_ply(path, with_normal=False):
         return vertex
 
 
-class ShapeCodesDataset(Dataset):
+class ShapeImageCodesDataset(Dataset):
     def __init__(self, phase, config):
         super(ShapeCodesDataset, self).__init__()
         self.n_points = config.n_points
         self.data_root = config.data_root
-        # self.abc_root = "/mnt/disk6/wurundi/abc"
-        self.abc_root = "/home/rundi/data/abc"
-        self.pc_root = self.abc_root + "/pc_v5a_processed_merge"
-        self.path = os.path.join(self.abc_root, "cad_e10_l6_c15_len60_min0_t100.json")
+        self.pc_root = config.pc_root
+        self.path = config.split_path
+        self.suffixes=config.suffixes
+        self.n_views=len(self.suffixes)
         with open(self.path, "r") as fp:
             self.all_data = json.load(fp)[phase]
 
         with h5py.File(self.data_root, 'r') as fp:
             self.zs = fp["{}_zs".format(phase)][:]
 
-        self.noise = config.noise
-
     def __getitem__(self, index):
-        data_id = self.all_data[index]
-        pc_path = os.path.join(self.pc_root, data_id + '.ply')
-        if not os.path.exists(pc_path):
+        code_index=index//self.n_views
+        view_suffix=self.suffixes[index%self.n_views]
+        data_id = self.all_data[code_index]
+        img_path = os.path.join(self.pc_root, f'{data_id}_{suffix}')
+        if not os.path.exists(img_path):
             return self.__getitem__(index + 1)
-        pc_n = read_ply(pc_path, with_normal=True)
-        pc = pc_n[:, :3]
-        normal = pc_n[:, -3:]
-        sample_idx = random.sample(list(range(pc.shape[0])), self.n_points)
-        pc = pc[sample_idx]
-        normal = normal[sample_idx]
-        normal = normal / (np.linalg.norm(normal, axis=1, keepdims=True) + 1e-6)
-        pc = pc + np.random.uniform(-self.noise, self.noise, (pc.shape[0], 1)) * normal
+
+        img = io.imread(img_path)
+        img[np.where(img[:, :, 3] == 0)] = 255
+        IMG_SIZE=224
+        img = transform.resize(img, (IMG_SIZE, IMG_SIZE))
+        img = img[:, :, :3].astype(np.float32)
+
+        img = torch.from_numpy(np.transpose(img, (2, 0, 1)))
+        img_normalized = self.normalize_img(img) if self.normalization else img
+
         pc = torch.tensor(pc, dtype=torch.float32)
         shape_code = torch.tensor(self.zs[index], dtype=torch.float32)
-        return {"points": pc, "code": shape_code, "id": data_id}
+        return {"image": pc, "code": shape_code, "id": data_id, 'suffix':view_suffix, 'metadata':metadata}
 
     def __len__(self):
-        return len(self.zs)
-
+        return len(self.zs)*self.n_views
 
 def get_dataloader(phase, config, shuffle=None):
     is_shuffle = phase == 'train' if shuffle is None else shuffle

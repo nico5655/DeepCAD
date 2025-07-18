@@ -1,3 +1,11 @@
 Untitled1.ipynb
 train_val_test_split.json
 .ipynb_checkpoints/Untitled1-checkpoint.ipynb
+data/cad_json
+data/pc_cad
+data/cad_json.tar.gz
+data/cad_vec.tar.gz
+*/__pycache__/
+*.stl
+*.png
+*metadata.txt

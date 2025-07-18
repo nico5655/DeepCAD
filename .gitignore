@@ -7,5 +7,5 @@ data/cad_json.tar.gz
 data/cad_vec.tar.gz
 */__pycache__/
 *.stl
-*.png
+*0.png
 *metadata.txt

@@ -91,66 +91,56 @@ scene.cycles.volume_bounces = 1
 
 
 # Load STL
-input_stls = argv[::2]
-output_imgs= argv[1::2]
-for mesh_path,out_path in zip(input_stls,output_imgs):
-    bpy.ops.import_mesh.stl(filepath=mesh_path)
-    # Center object
-    obj = bpy.context.selected_objects[0]
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-    obj.location = (0, 0, 0)
+elevation = argv[0]
+azimuth = argv[1]
+distance = argv[2]
+mesh_path = argv[3]
+output_img = argv[4]
 
-    mat = bpy.data.materials.new(name="GrayMaterial")
-    mat.diffuse_color = (0.20098039, 0.29117647, 0.50882353, 1)  # RGBA gray
-    mat.use_nodes = False
-    obj.data.materials.append(mat)
+bpy.ops.import_mesh.stl(filepath=mesh_path)
+# Center object
+obj = bpy.context.selected_objects[0]
+bpy.context.view_layer.objects.active = obj
+bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+obj.location = (0, 0, 0)
 
-    # Render
-    elevation0 = 30 + np.random.uniform(-10, 15)
-    bbox = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
-    bbox_center = sum(bbox, mathutils.Vector()) / 8
+mat = bpy.data.materials.new(name="GrayMaterial")
+mat.diffuse_color = (0.20098039, 0.29117647, 0.50882353, 1)  # RGBA gray
+mat.use_nodes = False
+obj.data.materials.append(mat)
 
-    # Estimate object "radius" from center to furthest corner
-    max_extent = max((v - bbox_center).length for v in bbox)
+# Render
+elevation0 = 30 + np.random.uniform(-10, 15)
+bbox = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
+bbox_center = sum(bbox, mathutils.Vector()) / 8
 
-    # Desired FOV (horizontal) in degrees
-    fov_deg = 45
-    sensor_width = 36  # mm, default for Blender full-frame camera
+# Estimate object "radius" from center to furthest corner
+max_extent = max((v - bbox_center).length for v in bbox)
 
-    # Compute camera distance
-    distance = 1.6*max_extent / math.tan(math.radians(fov_deg / 2))
-    attributes=""
-    bpy.ops.object.camera_add()
-    cam = bpy.context.object
-    bpy.context.scene.camera = cam
-    cam.data.lens = 65
-    for i in range(6):
-        elevation=elevation0+np.random.uniform(-5,5)
-        azimuth = i * 60
-        written_azim=azimuth+np.random.randint(-15,15)
-        cam_location = spherical_to_cartesian(elevation, written_azim, distance)
-        attributes+=f"{elevation} {written_azim} {distance}\n"
-        # Add and orient camera
-        cam.location=cam_location
-        target_location = mathutils.Vector((0, 0, 0))
-        direction = (target_location - cam_location).normalized()
-        up = mathutils.Vector((0, 1, 0))
-        right = direction.cross(up).normalized()
-        true_up = right.cross(direction).normalized()
-        rot_matrix = mathutils.Matrix((right, true_up, -direction)).transposed()
-        cam.rotation_euler = rot_matrix.to_euler()
+# Desired FOV (horizontal) in degrees
+fov_deg = 45
+sensor_width = 36  # mm, default for Blender full-frame camera
 
-        # Output path
-        scene.render.filepath = f"{out_path}_{azimuth:03d}.png"
+bpy.ops.object.camera_add()
+cam = bpy.context.object
+bpy.context.scene.camera = cam
+cam.data.lens = 65
 
-        # Render
-        bpy.ops.render.render(write_still=True)
+cam_location = spherical_to_cartesian(elevation, azimuth, distance)
+# Add and orient camera
+cam.location=cam_location
+target_location = mathutils.Vector((0, 0, 0))
+direction = (target_location - cam_location).normalized()
+up = mathutils.Vector((0, 1, 0))
+right = direction.cross(up).normalized()
+true_up = right.cross(direction).normalized()
+rot_matrix = mathutils.Matrix((right, true_up, -direction)).transposed()
+cam.rotation_euler = rot_matrix.to_euler()
 
+# Output path
+scene.render.filepath = f"{output_img}.png"
 
-    metadata_path=f'{out_path}_metadata.txt'
-    with open(metadata_path,'w') as f:
-        f.write(attributes)
+# Render
+bpy.ops.render.render(write_still=True)
+
     
-    bpy.data.objects.remove(obj, do_unlink=True)
-

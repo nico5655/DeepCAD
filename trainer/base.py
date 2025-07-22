@@ -70,6 +70,7 @@ class BaseTrainer(object):
         """load checkpoint from saved checkpoint"""
         name = name if name == 'latest' else "ckpt_epoch{}".format(name)
         load_path = os.path.join(self.model_dir, "{}.pth".format(name))
+        
         if not os.path.exists(load_path):
             raise ValueError("Checkpoint {} not exists.".format(load_path))
 

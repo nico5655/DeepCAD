@@ -78,7 +78,7 @@ def process_one(data_ids, only_pc=False):
             print("convert to image failed:", data_id)
             return None
             
-        print(f'Images creation: {time.time()-t}')
+        print(f'Images creation: {(time.time()-t):.2f} seconds')
 
     if not only_pc:
         for out_images,metadata,data_id in zip(all_out_images,metadatas,real_data_ids):
@@ -96,25 +96,24 @@ def process_one(data_ids, only_pc=False):
 with open(RECORD_FILE, "r") as fp:
     all_data = json.load(fp)
 
-# process_one(all_data["train"][3])
-# exit()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--only_test', action="store_true", help="only convert test data")
 parser.add_argument('--only_pc', action="store_true", help="generate point clouds only")
+parser.add_argument('--step2', action="store_true", help="Step 2")
 args = parser.parse_args()
 
 if args.only_pc:
     if not args.only_test:
         Parallel(n_jobs=10, verbose=2)(delayed(process_one)([x],True) for x in all_data["train"])
         Parallel(n_jobs=10, verbose=2)(delayed(process_one)([x],True) for x in all_data["validation"])
-    Parallel(n_jobs=10, verbose=2)(delayed(process_one)([x],True) for x in all_data["validation"])
+    Parallel(n_jobs=10, verbose=2)(delayed(process_one)([x],True) for x in all_data["test"])
 else:
     import time
     if not args.only_test:
         deltas_t=[0 for k in range(5)]
         n=len(all_data['train'])//20
-        for k in range(n):
+        for k in range(5000 if args.step2 else 0, n):
             x=all_data['train'][(k*20):((k+1)*20)]
             t=time.time()
             process_one(x)
@@ -141,7 +140,6 @@ else:
         x=all_data['test'][(k*20):((k+1)*20)]
         process_one(x)
         deltas_t.append(time.time()-t)
-        n=len(all_data['test'])
         avg_dur=sum(deltas_t[-5:])/5
         estimated_remaining=(avg_dur*(n-k))/3600
         print(f'Processed batch {k}/{n} of test set. Average time per shape: {(avg_dur/20):.2f} s. Estimated remaining time: {estimated_remaining:.2f} hours.')

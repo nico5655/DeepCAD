@@ -44,7 +44,6 @@ class CADDataset(Dataset):
         if self.aug and self.phase == "train":
             command1 = cad_vec[:, 0]
             ext_indices1 = np.where(command1 == EXT_IDX)[0]
-            # if len(ext_indices1) > 1 and random.randint(0, 1) == 1:
             if len(ext_indices1) > 1 and random.uniform(0, 1) > 0.5:
                 ext_vec1 = np.split(cad_vec, ext_indices1 + 1, axis=0)[:-1]
         

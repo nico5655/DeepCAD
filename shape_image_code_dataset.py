@@ -36,6 +36,7 @@ class ShapeImageCodesDataset(Dataset):
         elevation, azimuth, distance = [float(num) for num in metadata.split(' ')]
         metadata={'elevation': elevation, 'azimuth' : azimuth, 'distance' : distance}
         img = io.imread(img_path)
+        print(img.shape,img)
         img[np.where(img[:, :, 3] == 0)] = 255
         IMG_SIZE = 224
         img = transform.resize(img, (IMG_SIZE, IMG_SIZE))

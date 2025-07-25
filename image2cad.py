@@ -85,7 +85,7 @@ def display_examples(trainer, ae_model, example_data):
         write_stl_file(shape, filename)
         metadata=item['metadata']
         img_name=f"image_{name}.png"
-        os.system(f"blender --background --python render.py -- {metadata['elevation']} {metadata['azimuth']} {metadata['distance']} {filename} {img_name} 1>nul")
+        os.system(f"blender --background --python render_view.py -- {metadata['elevation']} {metadata['azimuth']} {metadata['distance']} {filename} {img_name} 1>nul")
         os.system(f'rm {filename}')
         img=Image.open(f"{img_name}.png")
         img=np.array(img)[:,::-1,:]

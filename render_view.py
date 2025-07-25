@@ -91,9 +91,9 @@ scene.cycles.volume_bounces = 1
 
 
 # Load STL
-elevation = argv[0]
-azimuth = argv[1]
-distance = argv[2]
+elevation = float(argv[0])
+azimuth = float(argv[1])
+distance = float(argv[2])
 mesh_path = argv[3]
 output_img = argv[4]
 
@@ -102,29 +102,19 @@ bpy.ops.import_mesh.stl(filepath=mesh_path)
 obj = bpy.context.selected_objects[0]
 bpy.context.view_layer.objects.active = obj
 bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-obj.location = (0, 0, 0)
+print(obj.location)
+#obj.location = (0, 0, 0)
 
 mat = bpy.data.materials.new(name="GrayMaterial")
 mat.diffuse_color = (0.20098039, 0.29117647, 0.50882353, 1)  # RGBA gray
 mat.use_nodes = False
 obj.data.materials.append(mat)
 
-# Render
-elevation0 = 30 + np.random.uniform(-10, 15)
-bbox = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
-bbox_center = sum(bbox, mathutils.Vector()) / 8
-
-# Estimate object "radius" from center to furthest corner
-max_extent = max((v - bbox_center).length for v in bbox)
-
-# Desired FOV (horizontal) in degrees
-fov_deg = 45
-sensor_width = 36  # mm, default for Blender full-frame camera
 
 bpy.ops.object.camera_add()
 cam = bpy.context.object
 bpy.context.scene.camera = cam
-cam.data.lens = 65
+cam.data.lens = 39.85
 
 cam_location = spherical_to_cartesian(elevation, azimuth, distance)
 # Add and orient camera
@@ -135,6 +125,7 @@ up = mathutils.Vector((0, 1, 0))
 right = direction.cross(up).normalized()
 true_up = right.cross(direction).normalized()
 rot_matrix = mathutils.Matrix((right, true_up, -direction)).transposed()
+print(rot_matrix)
 cam.rotation_euler = rot_matrix.to_euler()
 
 # Output path

@@ -44,7 +44,6 @@ def process_one(data_ids, only_pc=False):
         json_path = os.path.join(RAW_DATA, data_id + ".json")
         with open(json_path, "r") as fp:
             data = json.load(fp)
-
         try:
             cad_seq = CADSequence.from_dict(data)
             cad_seq.normalize()
@@ -113,7 +112,7 @@ else:
     if not args.only_test:
         deltas_t=[0 for k in range(5)]
         n=len(all_data['train'])//20
-        for k in range(5000 if args.step2 else 0, n):
+        for k in range(4600 if args.step2 else 4115, n):
             x=all_data['train'][(k*20):((k+1)*20)]
             t=time.time()
             process_one(x)
@@ -122,6 +121,7 @@ else:
             estimated_remaining=(avg_dur*(n-k))/3600
             print(f'Processed batch {k}/{n} of training set. Average time per shape: {(avg_dur/20):.2f} s. Estimated remaining time: {estimated_remaining:.2f} hours.')
         
+        print('wtf')
         deltas_t=[0 for k in range(5)]
         n=len(all_data['validation'])//20
         for k in range(n):

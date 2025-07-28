@@ -4,6 +4,7 @@ import numpy as np
 import os
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import Normalize
+from skimage import io, transform
 import json
 import h5py
 

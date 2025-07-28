@@ -118,13 +118,13 @@ max_extent = max((v - bbox_center).length for v in bbox)
 # Desired FOV (horizontal) in degrees
 fov_deg = 45
 sensor_width = 36  # mm, default for Blender full-frame camera
-sdistance = 1.6*max_extent / math.tan(math.radians(fov_deg / 2))
+distance = 1.6*max_extent / math.tan(math.radians(fov_deg / 2))
 print(sdistance,distance)
 
 bpy.ops.object.camera_add()
 cam = bpy.context.object
 bpy.context.scene.camera = cam
-cam.data.lens = 65
+cam.data.lens = 65#39.85, for the fake p3d
 
 cam_location = spherical_to_cartesian(elevation, azimuth, distance)
 # Add and orient camera

@@ -26,7 +26,7 @@ class ShapeImageCodesDataset(Dataset):
         code_index=index//self.n_views
         view_suffix=self.suffixes[index%self.n_views]
         data_id = self.all_data[code_index]
-        img_path = os.path.join(self.pc_root, f'{data_id}_{suffix}.png')
+        img_path = os.path.join(self.pc_root, f'{data_id}_{view_suffix}.png')
         if not os.path.exists(img_path):
             return self.__getitem__(index + 1)
         

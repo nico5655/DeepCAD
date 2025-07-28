@@ -5,6 +5,7 @@ import os
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import Normalize
 import json
+import h5py
 
 class ShapeImageCodesDataset(Dataset):
     def __init__(self, phase, config):

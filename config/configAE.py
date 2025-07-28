@@ -82,6 +82,7 @@ class ConfigAE(object):
         self.cont=False
         self.exp_name='image2cad'
         self.num_workers=8
+        self.warmup_step=2000
 
     def parse(self):
         """initiaize argument parser. Define default hyperparameters and collect from command-line arguments."""

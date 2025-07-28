@@ -39,6 +39,6 @@ class TrainAgent(BaseTrainer):
     def forward(self, data):
         images = data["images"].cuda()
         code = data["code"].cuda()
-        pred_code = self.net(points)
+        pred_code = self.net(images)
         loss = self.criterion(pred_code, code)
         return pred_code, {"mse": loss}

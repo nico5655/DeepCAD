@@ -17,6 +17,7 @@ class ShapeImageCodesDataset(Dataset):
         self.path = config.split_path
         self.suffixes=config.suffixes
         self.n_views=len(self.suffixes)
+        self.normalization=True
         self.normalize_img = Normalize(mean= [0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         with open(self.path, "r") as fp:
             self.all_data = json.load(fp)[phase]

@@ -7,6 +7,7 @@ from torchvision.transforms import Normalize
 from skimage import io, transform
 import json
 import h5py
+import random
 
 class ShapeImageCodesDataset(Dataset):
     def __init__(self, phase, config):
@@ -39,8 +40,7 @@ class ShapeImageCodesDataset(Dataset):
         elevation, azimuth, distance = [float(num) for num in metadata.split(' ')]
         metadata={'elevation': elevation, 'azimuth' : azimuth, 'distance' : distance}
         img = io.imread(img_path)
-        print(img.shape,img)
-        img[np.where(img[:, :, 3] == 0)] = 255
+        img[np.where(img[:, :, 3] == 0)] = 1
         IMG_SIZE = 224
         img = transform.resize(img, (IMG_SIZE, IMG_SIZE))
         img = img[:, :, :3].astype(np.float32)

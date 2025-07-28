@@ -6,8 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 
 class ShapeImageCodesDataset(Dataset):
     def __init__(self, phase, config):
-        super(ShapeCodesDataset, self).__init__()
-        self.n_points = config.n_points
+        super(ShapeImageCodesDataset, self).__init__()
         self.data_root = config.data_root
         self.pc_root = config.data_dir
         self.path = config.split_path

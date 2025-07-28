@@ -24,8 +24,8 @@ class ViTToDeepCADLatent(nn.Module):
 
 class TrainAgent(BaseTrainer):
     def build_net(self, config):
-        net = ViTToDeepCADLatent()
-        return net
+        self.net = ViTToDeepCADLatent()
+        return self.net
 
     def set_loss_function(self):
         self.criterion = nn.MSELoss().cuda()

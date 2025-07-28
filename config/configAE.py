@@ -74,7 +74,9 @@ class ConfigAE(object):
         }
         self.proj_dir='../proj_log'
         self.data_root='../data'
-        self.log_dir='../proj_log'
+        self.log_dir='../proj_log/image2cad/image2cad_main/log'
+        self.model_dir='../proj_log/image2cad/image2cad_main/model'
+        self.model=
         self.batch_size=512
 
     def parse(self):

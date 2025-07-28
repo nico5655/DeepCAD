@@ -13,7 +13,8 @@ class ConfigAE(object):
         self.set_configuration()
 
         # init hyperparameters and parse from command-line
-        #parser, args = self.parse()
+        return
+        parser, args = self.parse()
 
         # set as attributes
         print("----Experiment Configuration-----")

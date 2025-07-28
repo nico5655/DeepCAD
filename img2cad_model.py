@@ -37,8 +37,8 @@ class TrainAgent(BaseTrainer):
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, config.lr_step_size)
 
     def forward(self, data):
-        images = data["images"].cuda()
-        code = data["code"].cuda()
+        images = data["images"].cuda().float()
+        code = data["code"].cuda().float()
         pred_code = self.net(images)
         loss = self.criterion(pred_code, code)
         return pred_code, {"mse": loss}

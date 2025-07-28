@@ -77,6 +77,11 @@ class ConfigAE(object):
         self.log_dir='../proj_log/image2cad/image2cad_main/log'
         self.model_dir='../proj_log/image2cad/image2cad_main/model'
         self.batch_size=512
+        self.lr=1e-3
+        self.ckpt=1000
+        self.continue=False
+        self.exp_name='image2cad'
+        self.num_workers=8
 
     def parse(self):
         """initiaize argument parser. Define default hyperparameters and collect from command-line arguments."""

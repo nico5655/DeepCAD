@@ -75,7 +75,7 @@ class ConfigAE(object):
         self.proj_dir='../proj_log'
         self.data_root='../data'
         self.log_dir='../proj_log/pretrained/log'
-        self.model_dir='../proj_log/pretrained/model
+        self.model_dir='../proj_log/pretrained/model'
         self.batch_size=512
         self.lr=1e-3
         self.ckpt=1000

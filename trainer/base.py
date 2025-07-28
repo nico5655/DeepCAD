@@ -20,6 +20,7 @@ class BaseTrainer(object):
 
         # build network
         self.build_net(cfg)
+        print('net built')
 
         # set loss function
         self.set_loss_function()

@@ -25,6 +25,7 @@ class ViTToDeepCADLatent(nn.Module):
 class TrainAgent(BaseTrainer):
     def build_net(self, config):
         self.net = ViTToDeepCADLatent()
+        print('build...')
         return self.net
 
     def set_loss_function(self):

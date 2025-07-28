@@ -48,7 +48,6 @@ class ShapeImageCodesDataset(Dataset):
         img = torch.from_numpy(np.transpose(img, (2, 0, 1)))
         k = random.randint(0, 3)
         img = torch.rot90(img, k=k, dims=(1, 2))
-        print(img.max())
         img_normalized = self.normalize_img(img) if self.normalization else img
         shape_code = torch.tensor(self.zs[code_index], dtype=torch.float32)
         return {"images": img_normalized, "images_orig":img, "code": shape_code, "id": data_id, 'suffix':view_suffix, 'metadata':metadata}

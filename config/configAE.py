@@ -83,6 +83,7 @@ class ConfigAE(object):
         self.exp_name='pretrained'
         self.num_workers=8
         self.warmup_step=2000
+        grad_clip=None
 
     def parse(self):
         """initiaize argument parser. Define default hyperparameters and collect from command-line arguments."""

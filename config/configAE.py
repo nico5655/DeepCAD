@@ -13,7 +13,7 @@ class ConfigAE(object):
         self.set_configuration()
 
         # init hyperparameters and parse from command-line
-        parser, args = self.parse()
+        #parser, args = self.parse()
 
         # set as attributes
         print("----Experiment Configuration-----")
@@ -71,6 +71,9 @@ class ConfigAE(object):
             "loss_cmd_weight": 1.0,
             "loss_args_weight": 2.0
         }
+        self.proj_dir='../proj_log'
+        self.data_root='../data'
+        self.batch_size=512
 
     def parse(self):
         """initiaize argument parser. Define default hyperparameters and collect from command-line arguments."""

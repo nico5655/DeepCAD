@@ -79,7 +79,7 @@ class ConfigAE(object):
         self.batch_size=512
         self.lr=1e-3
         self.ckpt=1000
-        self.continue=False
+        self.cont=False
         self.exp_name='image2cad'
         self.num_workers=8
 

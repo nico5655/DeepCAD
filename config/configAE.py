@@ -74,13 +74,13 @@ class ConfigAE(object):
         }
         self.proj_dir='../proj_log'
         self.data_root='../data'
-        self.log_dir='../proj_log/image2cad/image2cad_main/log'
-        self.model_dir='../proj_log/image2cad/image2cad_main/model'
+        self.log_dir='../proj_log/pretrained/log'
+        self.model_dir='../proj_log/pretrained/model
         self.batch_size=512
         self.lr=1e-3
         self.ckpt=1000
         self.cont=False
-        self.exp_name='image2cad'
+        self.exp_name='pretrained'
         self.num_workers=8
         self.warmup_step=2000
 

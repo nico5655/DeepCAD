@@ -12,12 +12,17 @@ from trainer.base import BaseTrainer
 class ViTToDeepCADLatent(nn.Module):
     def __init__(self, latent_dim=256, pretrained=True):
         super().__init__()
-        self.vit = create_model("vit_base_patch16_224", pretrained=pretrained)
+        self.vit = create_model("vit_base_patch16_224", pretrained=pretrained,
+        drop_rate=0.1,           # Dropout on final hidden layer
+        attn_drop_rate=0.1,      # Dropout in attention weights
+        drop_path_rate=0.1)
         self.vit.reset_classifier(0)
+        self.dropout = nn.Dropout(p=0.15)
         self.project = nn.Linear(self.vit.num_features, latent_dim)
 
     def forward(self, x):
         features = self.vit(x)           # [B, 768]
+        features=self.dropout(features)
         latent = self.project(features)  # [B, 256]
         return latent
 

@@ -112,7 +112,7 @@ else:
     if not args.only_test:
         deltas_t=[0 for k in range(5)]
         n=len(all_data['train'])//20
-        for k in range(4600 if args.step2 else 4115, n):
+        for k in range(6700 if args.step2 else 4115, n):
             x=all_data['train'][(k*20):((k+1)*20)]
             t=time.time()
             process_one(x)

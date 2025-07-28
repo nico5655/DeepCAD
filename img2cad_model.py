@@ -6,6 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.models as models
 import torchvision.transforms as transforms
 from timm import create_model
+from trainer.base import BaseTrainer
 
 
 class ViTToDeepCADLatent(nn.Module):

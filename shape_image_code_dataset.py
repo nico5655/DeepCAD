@@ -18,6 +18,7 @@ class ShapeImageCodesDataset(Dataset):
         self.suffixes=config.suffixes
         self.n_views=len(self.suffixes)
         self.normalization=True
+        self.skips=0
         self.normalize_img = Normalize(mean= [0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         with open(self.path, "r") as fp:
             self.all_data = json.load(fp)[phase]
@@ -30,8 +31,13 @@ class ShapeImageCodesDataset(Dataset):
         view_suffix=self.suffixes[index%self.n_views]
         data_id = self.all_data[code_index]
         img_path = os.path.join(self.pc_root, f'{data_id}_{view_suffix}.png')
+        if index==0:
+            self.skips=0
+        if (index+1)%500==0:
+            print(f'Skipped {self.skips}/{index+1} = {((100*self.skips)/(index+1)):.2f} %')
         if not os.path.exists(img_path):
-            return self.__getitem__(index + 1)
+            self.skips+=1
+            return self.__getitem__((index + 1)%len(self))
         
         metadata_path = os.path.join(self.pc_root, f'{data_id}_render_metadata.txt')
         metadata=''

@@ -37,7 +37,7 @@ class ShapeImageCodesDataset(Dataset):
         if index==0:
             self.skips=0
         if (index+1)%self.skip_number==0:
-            print(f'Skipped {self.skips}/{index+1} = {((100*self.skips)/(index+1)):.2f} %')
+            print(f'In {self.phase}: skipped {self.skips}/{index+1} = {((100*self.skips)/(index+1)):.2f} %')
         if not os.path.exists(img_path):
             self.skips+=1
             return self.__getitem__((index + 1)%len(self))

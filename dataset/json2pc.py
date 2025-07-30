@@ -13,6 +13,7 @@ from cadlib.extrude import CADSequence
 from cadlib.visualize import CADsolid2pc, create_CAD, BatchCADSolid2views
 from utils.pc_utils import write_ply, read_ply
 from PIL import Image
+from OCC.Extend.DataExchange import write_stl_file
 
 DATA_ROOT = "../data"
 RAW_DATA = os.path.join(DATA_ROOT, "cad_json")
@@ -24,7 +25,7 @@ SAVE_DIR = os.path.join(DATA_ROOT, "pc_cad")
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
 
-INVALID_IDS = []
+INVALID_IDS = ['0011/00116212']
 
 
 def process_one(data_ids, only_pc=False):
@@ -36,7 +37,8 @@ def process_one(data_ids, only_pc=False):
             continue
 
         save_path = os.path.join(SAVE_DIR, data_id + ".ply")
-        if os.path.exists(save_path):
+        save_stl_path = os.path.join(SAVE_DIR, data_id + ".stl")
+        if os.path.exists(save_path) and os.path.exists(save_stl_path):
             if only_pc or os.path.exists(os.path.join(SAVE_DIR, f'{data_id}_render_metadata.txt')):
                 print("skip {}: file already exists".format(data_id))
                 continue
@@ -48,6 +50,7 @@ def process_one(data_ids, only_pc=False):
             cad_seq = CADSequence.from_dict(data)
             cad_seq.normalize()
             shape = create_CAD(cad_seq)
+            write_stl_file(shape,save_stl_path)
         except Exception as e:
             print("create_CAD failed:", data_id)
             continue
@@ -66,7 +69,6 @@ def process_one(data_ids, only_pc=False):
         real_data_ids.append(data_id)
         shapes.append(shape)
 
-    t=time.time()
     if len(real_data_ids)==0:
         return
     if not only_pc:
@@ -79,7 +81,6 @@ def process_one(data_ids, only_pc=False):
             
         print(f'Images creation: {(time.time()-t):.2f} seconds')
 
-    if not only_pc:
         for out_images,metadata,data_id in zip(all_out_images,metadatas,real_data_ids):
             for k,img in enumerate(out_images):
                 save_img_path = os.path.join(SAVE_DIR, f'{data_id}_{k:02d}.png')
@@ -99,7 +100,6 @@ with open(RECORD_FILE, "r") as fp:
 parser = argparse.ArgumentParser()
 parser.add_argument('--only_test', action="store_true", help="only convert test data")
 parser.add_argument('--only_pc', action="store_true", help="generate point clouds only")
-parser.add_argument('--step2', action="store_true", help="Step 2")
 args = parser.parse_args()
 
 if args.only_pc:
@@ -112,7 +112,7 @@ else:
     if not args.only_test:
         deltas_t=[0 for k in range(5)]
         n=len(all_data['train'])//20
-        for k in range(6700 if args.step2 else 4115, n):
+        for k in range(0, n):
             x=all_data['train'][(k*20):((k+1)*20)]
             t=time.time()
             process_one(x)
@@ -121,7 +121,6 @@ else:
             estimated_remaining=(avg_dur*(n-k))/3600
             print(f'Processed batch {k}/{n} of training set. Average time per shape: {(avg_dur/20):.2f} s. Estimated remaining time: {estimated_remaining:.2f} hours.')
         
-        print('wtf')
         deltas_t=[0 for k in range(5)]
         n=len(all_data['validation'])//20
         for k in range(n):

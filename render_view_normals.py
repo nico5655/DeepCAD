@@ -111,8 +111,33 @@ mat.use_nodes = False
 obj.data.materials.append(mat)
 
 scene.use_nodes = True
+tree = scene.node_tree
+nodes=tree.nodes
 
+render_layers = tree.nodes.new("CompositorNodeRLayers")
+# Render Layers node
+scale_normal = nodes.new(type="CompositorNodeMixRGB")
+scale_normal.blend_type = 'MULTIPLY'
+scale_normal.inputs[2].default_value = (0.5, 0.5, 0.5, 1)
+tree.links.new(render_layers.outputs['Normal'], scale_normal.inputs[1])
+bias_normal = nodes.new(type="CompositorNodeMixRGB")
+bias_normal.blend_type = 'ADD'
+scene.view_settings.view_transform = 'Raw'
+bias_normal.inputs[2].default_value = (0.5, 0.5, 0.5, 0)
+tree.links.new(scale_normal.outputs[0], bias_normal.inputs[1])
+normal_file_output = nodes.new(type="CompositorNodeOutputFile")
+normal_file_output.label = 'Normal Output'
+tree.links.new(bias_normal.outputs[0], normal_file_output.inputs[0])
 
+# Output to image file
+normal_file_output.base_path = "C:\\Users\\NWI3\\Desktop\\tmp\\"  # or any output directory you want
+normal_file_output.file_slots[0].path = "normal_"
+normal_file_output.format.file_format = 'PNG'
+normal_file_output.format.color_mode = 'RGB'
+normal_file_output.format.color_depth = '16'
+
+# Connect nodes
+print("Will save to:", normal_file_output.base_path + normal_file_output.file_slots[0].path)
 
 # Render
 bbox = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
@@ -123,13 +148,11 @@ max_extent = max((v - bbox_center).length for v in bbox)
 # Desired FOV (horizontal) in degrees
 fov_deg = 45
 sensor_width = 36  # mm, default for Blender full-frame camera
-
-factor=3
-distance = factor*1.6*max_extent / math.tan(math.radians(fov_deg / 2))
+distance = 1.6*max_extent / math.tan(math.radians(fov_deg / 2))
 bpy.ops.object.camera_add()
 cam = bpy.context.object
 bpy.context.scene.camera = cam
-cam.data.lens = factor*65#39.85, for the fake p3d
+cam.data.lens = 65#39.85, for the fake p3d
 
 cam_location = spherical_to_cartesian(elevation, azimuth, distance)
 # Add and orient camera

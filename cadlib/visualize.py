@@ -161,7 +161,7 @@ def BatchCADSolid2views(shapes,names=None):
         for i in range(6):
             azimuth=i*60
             img=Image.open(f"../{name}_{azimuth:03d}.png")
-            imgs.append(np.array(img)[:,::-1,:])
+            imgs.append(np.array(img))
             os.system(f'rm ../{name}_{azimuth:03d}.png')
 
         all_imgs.append(imgs)

@@ -4,6 +4,7 @@ train_val_test_split.json
 data/cad_json
 data/cad_vec
 data/pc_cad
+data/pc_cad2
 data/cad_json.tar.gz
 data/cad_vec.tar.gz
 **/__pycache__/

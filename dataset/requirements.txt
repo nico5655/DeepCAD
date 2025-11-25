@@ -1,0 +1,14 @@
+Cython
+h5py
+joblib
+matplotlib
+numpy
+Pillow
+plyfile
+scipy
+tensorboardX
+torch
+tqdm
+trimesh
+scikit-learn
+pyrender

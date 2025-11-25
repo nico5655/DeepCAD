@@ -7,6 +7,7 @@ data/pc_cad
 data/pc_cad2
 data/cad_json.tar.gz
 data/cad_vec.tar.gz
+dataset/cad_json.tar.gz
 **/__pycache__/
 proj_log/
 *.stl
